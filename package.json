@@ -1,0 +1,42 @@
+{
+  "name": "puppeteer-browser",
+  "version": "0.1.0",
+  "description": "Multiple Web browser controller based on Puppeteer API",
+  "main": "index.js",
+  "engines": {
+    "node": "^7.6.0"
+  },
+  "scripts": {
+    "precommit": "eslint .",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/EasyWebApp/puppeteer-browser.git"
+  },
+  "keywords": [
+    "Web",
+    "browser",
+    "Puppeteer",
+    "testing",
+    "automation"
+  ],
+  "author": "shiy2008@gmail.com",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/EasyWebApp/puppeteer-browser/issues"
+  },
+  "homepage": "https://github.com/EasyWebApp/puppeteer-browser#readme",
+  "dependencies": {
+    "koapache": "^0.2.3",
+    "puppeteer": "^1.4.0",
+    "puppeteer-fx": "0.0.4"
+  },
+  "optionalDependencies": {
+    "puppeteer-ie": "^0.5.4"
+  },
+  "devDependencies": {
+    "eslint": "^4.19.1",
+    "husky": "^0.14.3"
+  }
+}
