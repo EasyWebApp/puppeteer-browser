@@ -1,12 +1,12 @@
 'use strict';
 
-const browser_name = process.env.PUPPETEER_BROWSER.trim(),
+const browser_name = (process.env.npm_config_PUPPETEER_BROWSER || 'chrome').trim(),
     NPM_command = process.env.npm_lifecycle_script;
 
 const Puppeteer = require('puppeteer' + (map => {
-        
+
         for (let name in map)  if (browser_name === name)  return map[name];
-        
+
         return '';
     })({
         chrome:   '',
@@ -29,7 +29,8 @@ module.exports = class PuppeteerBrowser {
 
         return  browser || (
             browser = await Puppeteer.launch({
-                headless:  (! NPM_command.includes('--inspect'))
+                executablePath:  process.env['npm_config_' + browser_name],
+                headless:        (! NPM_command.includes('--inspect'))
             })
         );
     }
@@ -37,7 +38,7 @@ module.exports = class PuppeteerBrowser {
     /**
      * @param {?string} root       - Root path to start Web server, default to be `process.cwd()`
      * @param {string}  [path='.'] - Path to open Web page
-     * 
+     *
      * @return {Page}
      */
     static async getPage(root, path) {

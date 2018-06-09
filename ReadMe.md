@@ -32,8 +32,8 @@ then run one command below in your terminal
 node your_script
 
 # Firefox
-set PUPPETEER_BROWSER=firefox  &&  node your_script
+npm set PUPPETEER_BROWSER firefox  &&  node your_script
 
 # Internet Explorer
-set PUPPETEER_BROWSER=IE  &&  node your_script    
+npm set PUPPETEER_BROWSER IE  &&  node your_script
 ```

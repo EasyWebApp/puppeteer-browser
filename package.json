@@ -1,13 +1,14 @@
 {
   "name": "puppeteer-browser",
-  "version": "0.1.0",
+  "version": "0.1.5",
   "description": "Multiple Web browser controller based on Puppeteer API",
-  "main": "index.js",
+  "main": "source/index.js",
   "engines": {
     "node": "^7.6.0"
   },
   "scripts": {
     "precommit": "eslint .",
+    "preinstall": "node source/install",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -26,10 +27,11 @@
   "bugs": {
     "url": "https://github.com/EasyWebApp/puppeteer-browser/issues"
   },
-  "homepage": "https://github.com/EasyWebApp/puppeteer-browser#readme",
+  "homepage": "https://easywebapp.github.io/puppeteer-browser",
   "dependencies": {
+    "fs-match": "^1.1.0",
     "koapache": "^0.2.3",
-    "puppeteer": "^1.4.0",
+    "puppeteer": "^1.5.0",
     "puppeteer-fx": "0.0.4"
   },
   "optionalDependencies": {
