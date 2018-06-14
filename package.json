@@ -1,14 +1,16 @@
 {
   "name": "puppeteer-browser",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Multiple Web browser controller based on Puppeteer API",
-  "main": "source/index.js",
+  "main": "dist/index.js",
   "engines": {
-    "node": "^7.6.0"
+    "node": "^6.5.0"
   },
   "scripts": {
-    "build": "babel source/ -d dist/",
+    "build": "babel source/ -d dist/  &&  esdoc",
+    "start": "web-server docs/ -o",
     "precommit": "eslint source/",
+    "prepublishOnly": "npm run build",
     "preinstall": "npm set puppeteer_skip_chromium_download true  &&  app-find chrome firefox -c",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -47,6 +49,10 @@
     "babel-plugin-dynamic-import-node": "^1.2.0",
     "babel-plugin-transform-runtime": "^6.23.0",
     "babel-preset-env": "^1.7.0",
+    "esdoc": "^1.1.0",
+    "esdoc-ecmascript-proposal-plugin": "^1.0.0",
+    "esdoc-external-nodejs-plugin": "^1.0.0",
+    "esdoc-standard-plugin": "^1.0.0",
     "eslint": "^4.19.1",
     "husky": "^0.14.3"
   },

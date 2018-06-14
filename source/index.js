@@ -28,14 +28,29 @@ const module_name = 'puppeteer' + (map => {
 var server, browser, page;
 
 
-
+/**
+ * Wrapper of `Puppeteer` class
+ */
 export default  class PuppeteerBrowser {
-
+    /**
+     * @protected
+     *
+     * @param {string} [root] - Root path of the static site
+     *
+     * @return {Object} Server information
+     */
     static async getServer(root) {
 
         return  server  ||  (server = await WebServer(root || '.'));
     }
 
+    /**
+     * @param {Object} [options]
+     *
+     * @return {Browser}
+     *
+     * @see https://github.com/GoogleChrome/puppeteer/blob/v1.5.0/docs/api.md#puppeteerlaunchoptions
+     */
     static async launch(options) {
 
         const Puppeteer = await import( module_name );
@@ -43,6 +58,13 @@ export default  class PuppeteerBrowser {
         return  await Puppeteer.launch( options );
     }
 
+    /**
+     * @protected
+     *
+     * @param {boolean} [visible] - Browser visibility
+     *
+     * @return {Browser}
+     */
     static async getBrowser(visible) {
 
         return  browser || (
@@ -54,6 +76,14 @@ export default  class PuppeteerBrowser {
         );
     }
 
+    /**
+     * After files changed, the page will be focused & reloaded
+     *
+     * @param {string}   path     - Directory to watch recursively
+     * @param {function} onChange - Call on files changed
+     *
+     * @return {FSWatcher}
+     */
     static watch(path, onChange) {
 
         var listen;

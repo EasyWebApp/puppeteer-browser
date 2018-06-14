@@ -57,6 +57,10 @@ var module_name = 'puppeteer' + function (map) {
 
 var server, browser, page;
 
+/**
+ * Wrapper of `Puppeteer` class
+ */
+
 var PuppeteerBrowser = function () {
     function PuppeteerBrowser() {
         (0, _classCallCheck3.default)(this, PuppeteerBrowser);
@@ -64,6 +68,14 @@ var PuppeteerBrowser = function () {
 
     (0, _createClass3.default)(PuppeteerBrowser, null, [{
         key: 'getServer',
+
+        /**
+         * @protected
+         *
+         * @param {string} [root] - Root path of the static site
+         *
+         * @return {Object} Server information
+         */
         value: function () {
             var _ref = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee(root) {
                 return _regenerator2.default.wrap(function _callee$(_context) {
@@ -100,6 +112,15 @@ var PuppeteerBrowser = function () {
 
             return getServer;
         }()
+
+        /**
+         * @param {Object} [options]
+         *
+         * @return {Browser}
+         *
+         * @see https://github.com/GoogleChrome/puppeteer/blob/v1.5.0/docs/api.md#puppeteerlaunchoptions
+         */
+
     }, {
         key: 'launch',
         value: function () {
@@ -136,6 +157,15 @@ var PuppeteerBrowser = function () {
 
             return launch;
         }()
+
+        /**
+         * @protected
+         *
+         * @param {boolean} [visible] - Browser visibility
+         *
+         * @return {Browser}
+         */
+
     }, {
         key: 'getBrowser',
         value: function () {
@@ -177,6 +207,16 @@ var PuppeteerBrowser = function () {
 
             return getBrowser;
         }()
+
+        /**
+         * After files changed, the page will be focused & reloaded
+         *
+         * @param {string}   path     - Directory to watch recursively
+         * @param {function} onChange - Call on files changed
+         *
+         * @return {FSWatcher}
+         */
+
     }, {
         key: 'watch',
         value: function watch(path, onChange) {

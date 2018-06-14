@@ -1,6 +1,6 @@
 # Puppeteer browser
 
-Multiple **Web browser** controller based on [Puppeteer API](https://github.com/GoogleChrome/puppeteer/blob/v1.4.0/docs/api.md), wraps [`puppeteer`](https://github.com/GoogleChrome/puppeteer), [`puppeteer-fx`](https://github.com/autonome/puppeteer-fx) & [`puppeteer-ie`](https://techquery.github.io/Puppeteer-IE/) in one package.
+Multiple **Web browser** controller based on [Puppeteer API](https://github.com/GoogleChrome/puppeteer/blob/v1.5.0/docs/api.md), wraps [`puppeteer`](https://pptr.dev/), [`puppeteer-fx`](https://github.com/autonome/puppeteer-fx) & [`puppeteer-ie`](https://techquery.github.io/Puppeteer-IE/) in one package.
 
 [![NPM Dependency](https://david-dm.org/EasyWebApp/puppeteer-browser.svg)](https://david-dm.org/EasyWebApp/puppeteer-browser)
 
@@ -46,3 +46,11 @@ npm set PUPPETEER_BROWSER IE  &&  node your_script
 `directories.lib` field of `package.json` or `process.cwd()` will be watched.
 
 [Example from WebCell DevCLI](https://github.com/EasyWebApp/DevCLI/blob/master/source/index.js#L49)
+
+
+
+## API Document
+
+ - Online: [URL](https://easywebapp.github.io/puppeteer-browser) or `npm docs`
+
+ - Offline: `npm start`
