@@ -1,63 +1,114 @@
-'use strict';
+import 'babel-polyfill';
 
-const browser_name = (process.env.npm_config_PUPPETEER_BROWSER || 'chrome').trim(),
-    NPM_command = process.env.npm_lifecycle_script;
+import {readFileSync} from 'fs';
 
-const Puppeteer = require('puppeteer' + (map => {
+import {resolve} from 'url';
 
-        for (let name in map)  if (browser_name === name)  return map[name];
+import WebServer from 'koapache';
 
-        return '';
-    })({
-        chrome:   '',
-        firefox:  '-fx',
-        IE:       '-ie'
-    })),
-    WebServer = require('koapache'), URL_utility = require('url');
+import {watch} from 'chokidar';
+
+
+const Env = process.env, config = JSON.parse( readFileSync('./package.json') );
+
+const browser_name = (Env.npm_config_PUPPETEER_BROWSER || 'chrome').trim(),
+    NPM_command = Env.npm_lifecycle_script;
+
+const module_name = 'puppeteer' + (map => {
+
+    for (let name in map)  if (browser_name === name)  return map[name];
+
+    return '';
+})({
+    chrome:   '',
+    firefox:  '-fx',
+    IE:       '-ie'
+});
 
 var server, browser, page;
 
 
-module.exports = class PuppeteerBrowser {
+
+export default  class PuppeteerBrowser {
 
     static async getServer(root) {
 
-        return  server  ||  (server = await WebServer( root ));
+        return  server  ||  (server = await WebServer(root || '.'));
     }
 
-    static async getBrowser() {
+    static async launch(options) {
+
+        const Puppeteer = await import( module_name );
+
+        return  await Puppeteer.launch( options );
+    }
+
+    static async getBrowser(visible) {
 
         return  browser || (
-            browser = await Puppeteer.launch({
-                executablePath:  process.env['npm_config_' + browser_name],
-                headless:        (! NPM_command.includes('--inspect'))
+            browser = await PuppeteerBrowser.launch({
+                executablePath:  Env['npm_config_' + browser_name],
+                headless:        (visible != null)  ?
+                    (! visible)  :  (! NPM_command.includes('--inspect'))
             })
         );
     }
 
+    static watch(path, onChange) {
+
+        var listen;
+
+        async function refresh() {
+
+            await onChange();
+
+            await page.bringToFront();
+
+            await page.reload();
+
+            console.info(`[ Reload ]  ${page.url()}`);
+
+            listen = false;
+        }
+
+        return  watch( path ).on('change',  () => {
+
+            if (! listen) {
+
+                listen = true;
+
+                process.nextTick( refresh );
+            }
+        });
+    }
+
     /**
-     * @param {?string} root       - Root path to start Web server, default to be `process.cwd()`
-     * @param {string}  [path='.'] - Path to open Web page
-     *
+     * @param {?string}  root         - Root path to start Web server, default to be `process.cwd()`
+     * @param {?string}  path         - Path to open Web page
+     * @param {function} [fileChange] - Do something between files changed & page reload
+     *                                  (Browser will be visible)
      * @return {Page}
      */
-    static async getPage(root, path) {
+    static async getPage(root, path, fileChange) {
 
         if ( page )  return page;
 
-        page = await (await PuppeteerBrowser.getBrowser()).newPage();
+        fileChange = (fileChange instanceof Function)  &&  fileChange;
+
+        page = await (await PuppeteerBrowser.getBrowser( fileChange )).newPage();
 
         const server = path.indexOf('http') &&
             await PuppeteerBrowser.getServer( root );
 
         await page.goto(
             server ?
-                URL_utility.resolve(
-                    `http://${server.address}:${server.port}/`,  path || '.'
-                ) :
+                resolve(`http://${server.address}:${server.port}/`,  path || '.')  :
                 path
         );
 
+        if ( fileChange )
+            PuppeteerBrowser.watch(config.directories.lib || root,  fileChange);
+
         return page;
     }
-};
+}

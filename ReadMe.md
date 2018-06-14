@@ -8,12 +8,12 @@ Multiple **Web browser** controller based on [Puppeteer API](https://github.com/
 
 
 
-## Usage
+## Use as a Test runner
 
 Create `your_script.js`
 
 ```JavaScript
-const PuppeteerBrowser = require('puppeteer-browser');
+import PuppeteerBrowser from 'puppeteer-browser';
 
 (async () => {
 
@@ -37,3 +37,12 @@ npm set PUPPETEER_BROWSER firefox  &&  node your_script
 # Internet Explorer
 npm set PUPPETEER_BROWSER IE  &&  node your_script
 ```
+[ Notice ]  Option started with `--inspect` in the command-line will disable Headless mode.
+
+
+
+## Use as a developing viewer
+
+`directories.lib` field of `package.json` or `process.cwd()` will be watched.
+
+[Example from WebCell DevCLI](https://github.com/EasyWebApp/DevCLI/blob/master/source/index.js#L49)

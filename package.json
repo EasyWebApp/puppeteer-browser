@@ -1,14 +1,15 @@
 {
   "name": "puppeteer-browser",
-  "version": "0.1.5",
+  "version": "0.2.0",
   "description": "Multiple Web browser controller based on Puppeteer API",
   "main": "source/index.js",
   "engines": {
     "node": "^7.6.0"
   },
   "scripts": {
-    "precommit": "eslint .",
-    "preinstall": "node source/install",
+    "build": "babel source/ -d dist/",
+    "precommit": "eslint source/",
+    "preinstall": "npm set puppeteer_skip_chromium_download true  &&  app-find chrome firefox -c",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -29,7 +30,10 @@
   },
   "homepage": "https://easywebapp.github.io/puppeteer-browser",
   "dependencies": {
-    "fs-match": "^1.1.0",
+    "babel-polyfill": "^6.26.0",
+    "babel-runtime": "^6.26.0",
+    "chokidar": "^2.0.3",
+    "fs-match": "^1.3.1",
     "koapache": "^0.2.3",
     "puppeteer": "^1.5.0",
     "puppeteer-fx": "0.0.4"
@@ -38,7 +42,21 @@
     "puppeteer-ie": "^0.5.4"
   },
   "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-eslint": "^8.2.3",
+    "babel-plugin-dynamic-import-node": "^1.2.0",
+    "babel-plugin-transform-runtime": "^6.23.0",
+    "babel-preset-env": "^1.7.0",
     "eslint": "^4.19.1",
     "husky": "^0.14.3"
+  },
+  "babel": {
+    "presets": [
+      "env"
+    ],
+    "plugins": [
+      "transform-runtime",
+      "dynamic-import-node"
+    ]
   }
 }
