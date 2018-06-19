@@ -1,5 +1,3 @@
-import 'babel-polyfill';
-
 import {readFileSync} from 'fs';
 
 import {resolve} from 'url';
@@ -7,6 +5,13 @@ import {resolve} from 'url';
 import WebServer from 'koapache';
 
 import {watch} from 'chokidar';
+
+import {toString} from 'qrcode';
+
+import promisify from 'promisify-node';
+
+const QRCode = promisify( toString );
+
 
 
 const Env = process.env, config = JSON.parse( readFileSync('./package.json') );
@@ -92,11 +97,14 @@ export default  class PuppeteerBrowser {
 
             await onChange();
 
-            await page.bringToFront();
+            if ( page ) {
 
-            await page.reload();
+                await page.bringToFront();
 
-            console.info(`[ Reload ]  ${page.url()}`);
+                await page.reload();
+
+                console.info(`[ Reload ]  ${page.url()}`);
+            }
 
             listen = false;
         }
@@ -123,18 +131,20 @@ export default  class PuppeteerBrowser {
 
         if ( page )  return page;
 
-        fileChange = (fileChange instanceof Function)  &&  fileChange;
-
-        page = await (await PuppeteerBrowser.getBrowser( fileChange )).newPage();
+        fileChange = (fileChange instanceof Function)  ?  fileChange  :  null;
 
         const server = path.indexOf('http') &&
             await PuppeteerBrowser.getServer( root );
 
-        await page.goto(
-            server ?
-                resolve(`http://${server.address}:${server.port}/`,  path || '.')  :
-                path
+        const URI = resolve(
+            `http://${server.address}:${server.port}/`,  path || '.'
         );
+
+        if ( fileChange )  console.info(await QRCode( URI ));
+
+        page = await (await PuppeteerBrowser.getBrowser( fileChange )).newPage();
+
+        await page.on('close',  () => process.exit()).goto(server ? URI : path);
 
         if ( fileChange )
             PuppeteerBrowser.watch(config.directories.lib || root,  fileChange);

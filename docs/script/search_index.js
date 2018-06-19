@@ -6,6 +6,18 @@ window.esdocSearchIndex = [
     "class"
   ],
   [
+    "",
+    "test-file/test/index.js.html#lineNumber18",
+    "Static methods",
+    "test"
+  ],
+  [
+    "puppeteerbrowser.watch source/index.js~puppeteerbrowser.watch,puppeteerbrowser.watch",
+    "test-file/test/index.js.html#lineNumber27",
+    "Static methods Watch files changing",
+    "test"
+  ],
+  [
     "source/.external-ecmascript.js~array",
     "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array",
     "source/.external-ecmascript.js~Array",
@@ -328,5 +340,11 @@ window.esdocSearchIndex = [
     "class/source/index.js~PuppeteerBrowser.html#static-method-watch",
     "source/index.js~PuppeteerBrowser.watch",
     "method"
+  ],
+  [
+    "test/index.js",
+    "test-file/test/index.js.html",
+    "test/index.js",
+    "testFile"
   ]
 ]

@@ -24,8 +24,6 @@ var _createClass2 = require('babel-runtime/helpers/createClass');
 
 var _createClass3 = _interopRequireDefault(_createClass2);
 
-require('babel-polyfill');
-
 var _fs = require('fs');
 
 var _url = require('url');
@@ -36,7 +34,15 @@ var _koapache2 = _interopRequireDefault(_koapache);
 
 var _chokidar = require('chokidar');
 
+var _qrcode = require('qrcode');
+
+var _promisifyNode = require('promisify-node');
+
+var _promisifyNode2 = _interopRequireDefault(_promisifyNode);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var QRCode = (0, _promisifyNode2.default)(_qrcode.toString);
 
 var Env = process.env,
     config = JSON.parse((0, _fs.readFileSync)('./package.json'));
@@ -230,20 +236,27 @@ var PuppeteerBrowser = function () {
                                     return onChange();
 
                                 case 2:
-                                    _context4.next = 4;
+                                    if (!page) {
+                                        _context4.next = 8;
+                                        break;
+                                    }
+
+                                    _context4.next = 5;
                                     return page.bringToFront();
 
-                                case 4:
-                                    _context4.next = 6;
+                                case 5:
+                                    _context4.next = 7;
                                     return page.reload();
 
-                                case 6:
+                                case 7:
 
                                     console.info('[ Reload ]  ' + page.url());
 
+                                case 8:
+
                                     listen = false;
 
-                                case 8:
+                                case 9:
                                 case 'end':
                                     return _context4.stop();
                             }
@@ -281,7 +294,7 @@ var PuppeteerBrowser = function () {
         key: 'getPage',
         value: function () {
             var _ref5 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee5(root, path, fileChange) {
-                var server;
+                var server, URI;
                 return _regenerator2.default.wrap(function _callee5$(_context5) {
                     while (1) {
                         switch (_context5.prev = _context5.next) {
@@ -295,42 +308,61 @@ var PuppeteerBrowser = function () {
 
                             case 2:
 
-                                fileChange = fileChange instanceof Function && fileChange;
+                                fileChange = fileChange instanceof Function ? fileChange : null;
 
-                                _context5.next = 5;
-                                return PuppeteerBrowser.getBrowser(fileChange);
-
-                            case 5:
-                                _context5.next = 7;
-                                return _context5.sent.newPage();
-
-                            case 7:
-                                page = _context5.sent;
                                 _context5.t0 = path.indexOf('http');
 
                                 if (!_context5.t0) {
-                                    _context5.next = 13;
+                                    _context5.next = 8;
                                     break;
                                 }
 
-                                _context5.next = 12;
+                                _context5.next = 7;
                                 return PuppeteerBrowser.getServer(root);
 
-                            case 12:
+                            case 7:
                                 _context5.t0 = _context5.sent;
 
-                            case 13:
+                            case 8:
                                 server = _context5.t0;
-                                _context5.next = 16;
-                                return page.goto(server ? (0, _url.resolve)('http://' + server.address + ':' + server.port + '/', path || '.') : path);
+                                URI = (0, _url.resolve)('http://' + server.address + ':' + server.port + '/', path || '.');
+
+                                if (!fileChange) {
+                                    _context5.next = 16;
+                                    break;
+                                }
+
+                                _context5.t1 = console;
+                                _context5.next = 14;
+                                return QRCode(URI);
+
+                            case 14:
+                                _context5.t2 = _context5.sent;
+
+                                _context5.t1.info.call(_context5.t1, _context5.t2);
 
                             case 16:
+                                _context5.next = 18;
+                                return PuppeteerBrowser.getBrowser(fileChange);
+
+                            case 18:
+                                _context5.next = 20;
+                                return _context5.sent.newPage();
+
+                            case 20:
+                                page = _context5.sent;
+                                _context5.next = 23;
+                                return page.on('close', function () {
+                                    return process.exit();
+                                }).goto(server ? URI : path);
+
+                            case 23:
 
                                 if (fileChange) PuppeteerBrowser.watch(config.directories.lib || root, fileChange);
 
                                 return _context5.abrupt('return', page);
 
-                            case 18:
+                            case 25:
                             case 'end':
                                 return _context5.stop();
                         }

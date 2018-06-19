@@ -45,7 +45,7 @@ npm set PUPPETEER_BROWSER IE  &&  node your_script
 
 `directories.lib` field of `package.json` or `process.cwd()` will be watched.
 
-[Example from WebCell DevCLI](https://github.com/EasyWebApp/DevCLI/blob/master/source/index.js#L49)
+[Example from WebCell DevCLI](https://github.com/EasyWebApp/DevCLI/blob/master/source/index.js#L68)
 
 
 

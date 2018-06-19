@@ -579,7 +579,7 @@
     "__docId__": 50,
     "kind": "file",
     "name": "source/index.js",
-    "content": "import 'babel-polyfill';\n\nimport {readFileSync} from 'fs';\n\nimport {resolve} from 'url';\n\nimport WebServer from 'koapache';\n\nimport {watch} from 'chokidar';\n\n\nconst Env = process.env, config = JSON.parse( readFileSync('./package.json') );\n\nconst browser_name = (Env.npm_config_PUPPETEER_BROWSER || 'chrome').trim(),\n    NPM_command = Env.npm_lifecycle_script;\n\nconst module_name = 'puppeteer' + (map => {\n\n    for (let name in map)  if (browser_name === name)  return map[name];\n\n    return '';\n})({\n    chrome:   '',\n    firefox:  '-fx',\n    IE:       '-ie'\n});\n\nvar server, browser, page;\n\n\n/**\n * Wrapper of `Puppeteer` class\n */\nexport default  class PuppeteerBrowser {\n    /**\n     * @protected\n     *\n     * @param {string} [root] - Root path of the static site\n     *\n     * @return {Object} Server information\n     */\n    static async getServer(root) {\n\n        return  server  ||  (server = await WebServer(root || '.'));\n    }\n\n    /**\n     * @param {Object} [options]\n     *\n     * @return {Browser}\n     *\n     * @see https://github.com/GoogleChrome/puppeteer/blob/v1.5.0/docs/api.md#puppeteerlaunchoptions\n     */\n    static async launch(options) {\n\n        const Puppeteer = await import( module_name );\n\n        return  await Puppeteer.launch( options );\n    }\n\n    /**\n     * @protected\n     *\n     * @param {boolean} [visible] - Browser visibility\n     *\n     * @return {Browser}\n     */\n    static async getBrowser(visible) {\n\n        return  browser || (\n            browser = await PuppeteerBrowser.launch({\n                executablePath:  Env['npm_config_' + browser_name],\n                headless:        (visible != null)  ?\n                    (! visible)  :  (! NPM_command.includes('--inspect'))\n            })\n        );\n    }\n\n    /**\n     * After files changed, the page will be focused & reloaded\n     *\n     * @param {string}   path     - Directory to watch recursively\n     * @param {function} onChange - Call on files changed\n     *\n     * @return {FSWatcher}\n     */\n    static watch(path, onChange) {\n\n        var listen;\n\n        async function refresh() {\n\n            await onChange();\n\n            await page.bringToFront();\n\n            await page.reload();\n\n            console.info(`[ Reload ]  ${page.url()}`);\n\n            listen = false;\n        }\n\n        return  watch( path ).on('change',  () => {\n\n            if (! listen) {\n\n                listen = true;\n\n                process.nextTick( refresh );\n            }\n        });\n    }\n\n    /**\n     * @param {?string}  root         - Root path to start Web server, default to be `process.cwd()`\n     * @param {?string}  path         - Path to open Web page\n     * @param {function} [fileChange] - Do something between files changed & page reload\n     *                                  (Browser will be visible)\n     * @return {Page}\n     */\n    static async getPage(root, path, fileChange) {\n\n        if ( page )  return page;\n\n        fileChange = (fileChange instanceof Function)  &&  fileChange;\n\n        page = await (await PuppeteerBrowser.getBrowser( fileChange )).newPage();\n\n        const server = path.indexOf('http') &&\n            await PuppeteerBrowser.getServer( root );\n\n        await page.goto(\n            server ?\n                resolve(`http://${server.address}:${server.port}/`,  path || '.')  :\n                path\n        );\n\n        if ( fileChange )\n            PuppeteerBrowser.watch(config.directories.lib || root,  fileChange);\n\n        return page;\n    }\n}\n",
+    "content": "import {readFileSync} from 'fs';\n\nimport {resolve} from 'url';\n\nimport WebServer from 'koapache';\n\nimport {watch} from 'chokidar';\n\nimport {toString} from 'qrcode';\n\nimport promisify from 'promisify-node';\n\nconst QRCode = promisify( toString );\n\n\n\nconst Env = process.env, config = JSON.parse( readFileSync('./package.json') );\n\nconst browser_name = (Env.npm_config_PUPPETEER_BROWSER || 'chrome').trim(),\n    NPM_command = Env.npm_lifecycle_script;\n\nconst module_name = 'puppeteer' + (map => {\n\n    for (let name in map)  if (browser_name === name)  return map[name];\n\n    return '';\n})({\n    chrome:   '',\n    firefox:  '-fx',\n    IE:       '-ie'\n});\n\nvar server, browser, page;\n\n\n/**\n * Wrapper of `Puppeteer` class\n */\nexport default  class PuppeteerBrowser {\n    /**\n     * @protected\n     *\n     * @param {string} [root] - Root path of the static site\n     *\n     * @return {Object} Server information\n     */\n    static async getServer(root) {\n\n        return  server  ||  (server = await WebServer(root || '.'));\n    }\n\n    /**\n     * @param {Object} [options]\n     *\n     * @return {Browser}\n     *\n     * @see https://github.com/GoogleChrome/puppeteer/blob/v1.5.0/docs/api.md#puppeteerlaunchoptions\n     */\n    static async launch(options) {\n\n        const Puppeteer = await import( module_name );\n\n        return  await Puppeteer.launch( options );\n    }\n\n    /**\n     * @protected\n     *\n     * @param {boolean} [visible] - Browser visibility\n     *\n     * @return {Browser}\n     */\n    static async getBrowser(visible) {\n\n        return  browser || (\n            browser = await PuppeteerBrowser.launch({\n                executablePath:  Env['npm_config_' + browser_name],\n                headless:        (visible != null)  ?\n                    (! visible)  :  (! NPM_command.includes('--inspect'))\n            })\n        );\n    }\n\n    /**\n     * After files changed, the page will be focused & reloaded\n     *\n     * @param {string}   path     - Directory to watch recursively\n     * @param {function} onChange - Call on files changed\n     *\n     * @return {FSWatcher}\n     */\n    static watch(path, onChange) {\n\n        var listen;\n\n        async function refresh() {\n\n            await onChange();\n\n            if ( page ) {\n\n                await page.bringToFront();\n\n                await page.reload();\n\n                console.info(`[ Reload ]  ${page.url()}`);\n            }\n\n            listen = false;\n        }\n\n        return  watch( path ).on('change',  () => {\n\n            if (! listen) {\n\n                listen = true;\n\n                process.nextTick( refresh );\n            }\n        });\n    }\n\n    /**\n     * @param {?string}  root         - Root path to start Web server, default to be `process.cwd()`\n     * @param {?string}  path         - Path to open Web page\n     * @param {function} [fileChange] - Do something between files changed & page reload\n     *                                  (Browser will be visible)\n     * @return {Page}\n     */\n    static async getPage(root, path, fileChange) {\n\n        if ( page )  return page;\n\n        fileChange = (fileChange instanceof Function)  ?  fileChange  :  null;\n\n        const server = path.indexOf('http') &&\n            await PuppeteerBrowser.getServer( root );\n\n        const URI = resolve(\n            `http://${server.address}:${server.port}/`,  path || '.'\n        );\n\n        if ( fileChange )  console.info(await QRCode( URI ));\n\n        page = await (await PuppeteerBrowser.getBrowser( fileChange )).newPage();\n\n        await page.on('close',  () => process.exit()).goto(server ? URI : path);\n\n        if ( fileChange )\n            PuppeteerBrowser.watch(config.directories.lib || root,  fileChange);\n\n        return page;\n    }\n}\n",
     "static": true,
     "longname": "D:/OpenSource/puppeteer-browser/source/index.js",
     "access": "public",
@@ -589,16 +589,16 @@
   {
     "__docId__": 51,
     "kind": "variable",
-    "name": "Env",
+    "name": "QRCode",
     "memberof": "source/index.js",
     "static": true,
-    "longname": "source/index.js~Env",
+    "longname": "source/index.js~QRCode",
     "access": "public",
     "export": false,
     "importPath": "puppeteer-browser/source/index.js",
     "importStyle": null,
     "description": null,
-    "lineNumber": 12,
+    "lineNumber": 13,
     "undocument": true,
     "type": {
       "types": [
@@ -610,31 +610,10 @@
   {
     "__docId__": 52,
     "kind": "variable",
-    "name": "browser_name",
+    "name": "Env",
     "memberof": "source/index.js",
     "static": true,
-    "longname": "source/index.js~browser_name",
-    "access": "public",
-    "export": false,
-    "importPath": "puppeteer-browser/source/index.js",
-    "importStyle": null,
-    "description": null,
-    "lineNumber": 14,
-    "undocument": true,
-    "type": {
-      "types": [
-        "*"
-      ]
-    },
-    "ignore": true
-  },
-  {
-    "__docId__": 53,
-    "kind": "variable",
-    "name": "module_name",
-    "memberof": "source/index.js",
-    "static": true,
-    "longname": "source/index.js~module_name",
+    "longname": "source/index.js~Env",
     "access": "public",
     "export": false,
     "importPath": "puppeteer-browser/source/index.js",
@@ -650,7 +629,49 @@
     "ignore": true
   },
   {
+    "__docId__": 53,
+    "kind": "variable",
+    "name": "browser_name",
+    "memberof": "source/index.js",
+    "static": true,
+    "longname": "source/index.js~browser_name",
+    "access": "public",
+    "export": false,
+    "importPath": "puppeteer-browser/source/index.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 19,
+    "undocument": true,
+    "type": {
+      "types": [
+        "*"
+      ]
+    },
+    "ignore": true
+  },
+  {
     "__docId__": 54,
+    "kind": "variable",
+    "name": "module_name",
+    "memberof": "source/index.js",
+    "static": true,
+    "longname": "source/index.js~module_name",
+    "access": "public",
+    "export": false,
+    "importPath": "puppeteer-browser/source/index.js",
+    "importStyle": null,
+    "description": null,
+    "lineNumber": 22,
+    "undocument": true,
+    "type": {
+      "types": [
+        "*"
+      ]
+    },
+    "ignore": true
+  },
+  {
+    "__docId__": 55,
     "kind": "class",
     "name": "PuppeteerBrowser",
     "memberof": "source/index.js",
@@ -661,11 +682,11 @@
     "importPath": "puppeteer-browser/source/index.js",
     "importStyle": "PuppeteerBrowser",
     "description": "Wrapper of `Puppeteer` class",
-    "lineNumber": 34,
+    "lineNumber": 39,
     "interface": false
   },
   {
-    "__docId__": 55,
+    "__docId__": 56,
     "kind": "method",
     "name": "getServer",
     "memberof": "source/index.js~PuppeteerBrowser",
@@ -675,7 +696,7 @@
     "longname": "source/index.js~PuppeteerBrowser.getServer",
     "access": "protected",
     "description": "",
-    "lineNumber": 42,
+    "lineNumber": 47,
     "params": [
       {
         "nullable": null,
@@ -698,7 +719,7 @@
     }
   },
   {
-    "__docId__": 56,
+    "__docId__": 57,
     "kind": "method",
     "name": "launch",
     "memberof": "source/index.js~PuppeteerBrowser",
@@ -711,7 +732,7 @@
     "see": [
       "https://github.com/GoogleChrome/puppeteer/blob/v1.5.0/docs/api.md#puppeteerlaunchoptions"
     ],
-    "lineNumber": 54,
+    "lineNumber": 59,
     "params": [
       {
         "nullable": null,
@@ -734,7 +755,7 @@
     }
   },
   {
-    "__docId__": 57,
+    "__docId__": 58,
     "kind": "method",
     "name": "getBrowser",
     "memberof": "source/index.js~PuppeteerBrowser",
@@ -744,7 +765,7 @@
     "longname": "source/index.js~PuppeteerBrowser.getBrowser",
     "access": "protected",
     "description": "",
-    "lineNumber": 68,
+    "lineNumber": 73,
     "params": [
       {
         "nullable": null,
@@ -767,7 +788,7 @@
     }
   },
   {
-    "__docId__": 58,
+    "__docId__": 59,
     "kind": "method",
     "name": "watch",
     "memberof": "source/index.js~PuppeteerBrowser",
@@ -777,7 +798,7 @@
     "longname": "source/index.js~PuppeteerBrowser.watch",
     "access": "public",
     "description": "After files changed, the page will be focused & reloaded",
-    "lineNumber": 87,
+    "lineNumber": 92,
     "params": [
       {
         "nullable": null,
@@ -810,7 +831,7 @@
     }
   },
   {
-    "__docId__": 59,
+    "__docId__": 60,
     "kind": "method",
     "name": "getPage",
     "memberof": "source/index.js~PuppeteerBrowser",
@@ -820,7 +841,7 @@
     "longname": "source/index.js~PuppeteerBrowser.getPage",
     "access": "public",
     "description": "",
-    "lineNumber": 122,
+    "lineNumber": 130,
     "params": [
       {
         "nullable": true,
@@ -864,7 +885,7 @@
   },
   {
     "kind": "index",
-    "content": "# Puppeteer browser\n\nMultiple **Web browser** controller based on [Puppeteer API](https://github.com/GoogleChrome/puppeteer/blob/v1.5.0/docs/api.md), wraps [`puppeteer`](https://pptr.dev/), [`puppeteer-fx`](https://github.com/autonome/puppeteer-fx) & [`puppeteer-ie`](https://techquery.github.io/Puppeteer-IE/) in one package.\n\n[![NPM Dependency](https://david-dm.org/EasyWebApp/puppeteer-browser.svg)](https://david-dm.org/EasyWebApp/puppeteer-browser)\n\n[![NPM](https://nodei.co/npm/puppeteer-browser.png?downloads=true&downloadRank=true&stars=true)](https://nodei.co/npm/puppeteer-browser/)\n\n\n\n## Use as a Test runner\n\nCreate `your_script.js`\n\n```JavaScript\nimport PuppeteerBrowser from 'puppeteer-browser';\n\n(async () => {\n\n    const page = await PuppeteerBrowser.getPage(\n        'path/to/start/server', 'path/to/open/page'\n    );\n\n    console.log( page.title() );\n})();\n```\n\nthen run one command below in your terminal\n\n```Shell\n# Chrome\nnode your_script\n\n# Firefox\nnpm set PUPPETEER_BROWSER firefox  &&  node your_script\n\n# Internet Explorer\nnpm set PUPPETEER_BROWSER IE  &&  node your_script\n```\n[ Notice ]  Option started with `--inspect` in the command-line will disable Headless mode.\n\n\n\n## Use as a developing viewer\n\n`directories.lib` field of `package.json` or `process.cwd()` will be watched.\n\n[Example from WebCell DevCLI](https://github.com/EasyWebApp/DevCLI/blob/master/source/index.js#L49)\n\n\n\n## API Document\n\n - Online: [URL](https://easywebapp.github.io/puppeteer-browser) or `npm docs`\n\n - Offline: `npm start`\n",
+    "content": "# Puppeteer browser\n\nMultiple **Web browser** controller based on [Puppeteer API](https://github.com/GoogleChrome/puppeteer/blob/v1.5.0/docs/api.md), wraps [`puppeteer`](https://pptr.dev/), [`puppeteer-fx`](https://github.com/autonome/puppeteer-fx) & [`puppeteer-ie`](https://techquery.github.io/Puppeteer-IE/) in one package.\n\n[![NPM Dependency](https://david-dm.org/EasyWebApp/puppeteer-browser.svg)](https://david-dm.org/EasyWebApp/puppeteer-browser)\n\n[![NPM](https://nodei.co/npm/puppeteer-browser.png?downloads=true&downloadRank=true&stars=true)](https://nodei.co/npm/puppeteer-browser/)\n\n\n\n## Use as a Test runner\n\nCreate `your_script.js`\n\n```JavaScript\nimport PuppeteerBrowser from 'puppeteer-browser';\n\n(async () => {\n\n    const page = await PuppeteerBrowser.getPage(\n        'path/to/start/server', 'path/to/open/page'\n    );\n\n    console.log( page.title() );\n})();\n```\n\nthen run one command below in your terminal\n\n```Shell\n# Chrome\nnode your_script\n\n# Firefox\nnpm set PUPPETEER_BROWSER firefox  &&  node your_script\n\n# Internet Explorer\nnpm set PUPPETEER_BROWSER IE  &&  node your_script\n```\n[ Notice ]  Option started with `--inspect` in the command-line will disable Headless mode.\n\n\n\n## Use as a developing viewer\n\n`directories.lib` field of `package.json` or `process.cwd()` will be watched.\n\n[Example from WebCell DevCLI](https://github.com/EasyWebApp/DevCLI/blob/master/source/index.js#L68)\n\n\n\n## API Document\n\n - Online: [URL](https://easywebapp.github.io/puppeteer-browser) or `npm docs`\n\n - Offline: `npm start`\n",
     "longname": "D:\\OpenSource\\puppeteer-browser\\README.md",
     "name": "./README.md",
     "static": true,
@@ -872,10 +893,50 @@
   },
   {
     "kind": "packageJSON",
-    "content": "{\n  \"name\": \"puppeteer-browser\",\n  \"version\": \"0.2.1\",\n  \"description\": \"Multiple Web browser controller based on Puppeteer API\",\n  \"main\": \"dist/index.js\",\n  \"engines\": {\n    \"node\": \"^6.5.0\"\n  },\n  \"scripts\": {\n    \"build\": \"babel source/ -d dist/  &&  esdoc\",\n    \"start\": \"web-server docs/ -o\",\n    \"precommit\": \"eslint source/\",\n    \"prepublishOnly\": \"npm run build\",\n    \"preinstall\": \"npm set puppeteer_skip_chromium_download true  &&  app-find chrome firefox -c\",\n    \"test\": \"echo \\\"Error: no test specified\\\" && exit 1\"\n  },\n  \"repository\": {\n    \"type\": \"git\",\n    \"url\": \"git+https://github.com/EasyWebApp/puppeteer-browser.git\"\n  },\n  \"keywords\": [\n    \"Web\",\n    \"browser\",\n    \"Puppeteer\",\n    \"testing\",\n    \"automation\"\n  ],\n  \"author\": \"shiy2008@gmail.com\",\n  \"license\": \"Apache-2.0\",\n  \"bugs\": {\n    \"url\": \"https://github.com/EasyWebApp/puppeteer-browser/issues\"\n  },\n  \"homepage\": \"https://easywebapp.github.io/puppeteer-browser\",\n  \"dependencies\": {\n    \"babel-polyfill\": \"^6.26.0\",\n    \"babel-runtime\": \"^6.26.0\",\n    \"chokidar\": \"^2.0.3\",\n    \"fs-match\": \"^1.3.1\",\n    \"koapache\": \"^0.2.3\",\n    \"puppeteer\": \"^1.5.0\",\n    \"puppeteer-fx\": \"0.0.4\"\n  },\n  \"optionalDependencies\": {\n    \"puppeteer-ie\": \"^0.5.4\"\n  },\n  \"devDependencies\": {\n    \"babel-cli\": \"^6.26.0\",\n    \"babel-eslint\": \"^8.2.3\",\n    \"babel-plugin-dynamic-import-node\": \"^1.2.0\",\n    \"babel-plugin-transform-runtime\": \"^6.23.0\",\n    \"babel-preset-env\": \"^1.7.0\",\n    \"esdoc\": \"^1.1.0\",\n    \"esdoc-ecmascript-proposal-plugin\": \"^1.0.0\",\n    \"esdoc-external-nodejs-plugin\": \"^1.0.0\",\n    \"esdoc-standard-plugin\": \"^1.0.0\",\n    \"eslint\": \"^4.19.1\",\n    \"husky\": \"^0.14.3\"\n  },\n  \"babel\": {\n    \"presets\": [\n      \"env\"\n    ],\n    \"plugins\": [\n      \"transform-runtime\",\n      \"dynamic-import-node\"\n    ]\n  }\n}\n",
+    "content": "{\n  \"name\": \"puppeteer-browser\",\n  \"version\": \"0.3.0\",\n  \"description\": \"Multiple Web browser controller based on Puppeteer API\",\n  \"main\": \"dist/index.js\",\n  \"engines\": {\n    \"node\": \"^6.5.0\"\n  },\n  \"scripts\": {\n    \"build\": \"babel source/ -d dist/  &&  esdoc\",\n    \"start\": \"web-server docs/ -o\",\n    \"prepublishOnly\": \"npm run build\",\n    \"preinstall\": \"npm set puppeteer_skip_chromium_download true\",\n    \"install\": \"app-find chrome firefox -c\",\n    \"check\": \"mocha -r babel-register -r should -r should-sinon --no-timeouts -c --inline-diffs\",\n    \"test\": \"npm run check -- --exit\",\n    \"debug\": \"npm run check -- --inspect-brk\",\n    \"precommit\": \"eslint source/ test/  &&  npm test\"\n  },\n  \"repository\": {\n    \"type\": \"git\",\n    \"url\": \"git+https://github.com/EasyWebApp/puppeteer-browser.git\"\n  },\n  \"keywords\": [\n    \"Web\",\n    \"browser\",\n    \"Puppeteer\",\n    \"testing\",\n    \"automation\"\n  ],\n  \"author\": \"shiy2008@gmail.com\",\n  \"license\": \"Apache-2.0\",\n  \"bugs\": {\n    \"url\": \"https://github.com/EasyWebApp/puppeteer-browser/issues\"\n  },\n  \"homepage\": \"https://easywebapp.github.io/puppeteer-browser\",\n  \"dependencies\": {\n    \"babel-polyfill\": \"^6.26.0\",\n    \"babel-runtime\": \"^6.26.0\",\n    \"chokidar\": \"^2.0.3\",\n    \"fs-match\": \"^1.3.1\",\n    \"koapache\": \"^0.2.3\",\n    \"promisify-node\": \"^0.5.0\",\n    \"puppeteer\": \"^1.5.0\",\n    \"puppeteer-fx\": \"0.0.4\",\n    \"qrcode\": \"^1.2.0\"\n  },\n  \"optionalDependencies\": {\n    \"puppeteer-ie\": \"^0.5.4\"\n  },\n  \"devDependencies\": {\n    \"babel-cli\": \"^6.26.0\",\n    \"babel-eslint\": \"^8.2.3\",\n    \"babel-plugin-dynamic-import-node\": \"^1.2.0\",\n    \"babel-plugin-transform-runtime\": \"^6.23.0\",\n    \"babel-preset-env\": \"^1.7.0\",\n    \"babel-register\": \"^6.26.0\",\n    \"esdoc\": \"^1.1.0\",\n    \"esdoc-ecmascript-proposal-plugin\": \"^1.0.0\",\n    \"esdoc-external-nodejs-plugin\": \"^1.0.0\",\n    \"esdoc-standard-plugin\": \"^1.0.0\",\n    \"eslint\": \"^4.19.1\",\n    \"husky\": \"^0.14.3\",\n    \"mocha\": \"^5.2.0\",\n    \"should\": \"^13.2.1\",\n    \"should-sinon\": \"0.0.6\",\n    \"sinon\": \"^6.0.0\"\n  },\n  \"babel\": {\n    \"presets\": [\n      \"env\"\n    ],\n    \"plugins\": [\n      \"transform-runtime\",\n      \"dynamic-import-node\"\n    ]\n  }\n}\n",
     "longname": "D:\\OpenSource\\puppeteer-browser\\package.json",
     "name": "package.json",
     "static": true,
     "access": "public"
+  },
+  {
+    "__docId__": 61,
+    "kind": "testFile",
+    "name": "test/index.js",
+    "content": "import PuppeteerBrowser from '../source/index';\n\nimport sinon from 'sinon';\n\nimport promisify from 'promisify-node';\n\nconst {mkdir, writeFile, appendFileSync, unlink, rmdir} = promisify('fs');\n\n\nfunction wait(second, func) {\n\n    return  new Promise(resolve => setTimeout(\n        ()  =>  resolve( func() ),  second * 1000\n    ));\n}\n\n\ndescribe('Static methods',  () => {\n\n    before(() => mkdir('test/example'));\n\n    const file = 'test/example/test.js';\n\n    /**\n     * @test {PuppeteerBrowser.watch}\n     */\n    it('Watch files changing',  async () => {\n\n        const onChange = sinon.spy();\n\n        await writeFile(file, '');\n\n        PuppeteerBrowser.watch('test/example/', onChange);\n\n        await wait(1,  ()  =>  appendFileSync(file, 'test'));\n\n        await wait(1,  () => onChange.should.be.calledOnce());\n    });\n\n\n    after(async () => {\n\n        await unlink( file );\n\n        await rmdir('test/example');\n    });\n});\n",
+    "static": true,
+    "longname": "D:/OpenSource/puppeteer-browser/test/index.js",
+    "access": null,
+    "description": null,
+    "lineNumber": 1
+  },
+  {
+    "__docId__": 62,
+    "kind": "test",
+    "name": "describe0",
+    "testId": 0,
+    "memberof": "test/index.js",
+    "testDepth": 0,
+    "static": true,
+    "longname": "test/index.js~describe0",
+    "access": null,
+    "description": "Static methods",
+    "lineNumber": 18
+  },
+  {
+    "__docId__": 63,
+    "kind": "test",
+    "name": "it1",
+    "testId": 1,
+    "memberof": "test/index.js~describe0",
+    "testDepth": 1,
+    "static": true,
+    "longname": "test/index.js~describe0.it1",
+    "access": null,
+    "description": "Watch files changing",
+    "lineNumber": 27,
+    "testTargets": [
+      "PuppeteerBrowser.watch"
+    ]
   }
 ]

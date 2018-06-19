@@ -16,7 +16,7 @@
   
   <a href="identifiers.html">Reference</a>
   <a href="source.html">Source</a>
-  
+  <a href="test.html" data-ice="testLink">Test</a>
   <div class="search-box">
   <span>
     <img src="./image/search.png">
@@ -35,15 +35,20 @@
 </nav>
 
 <div class="content" data-ice="content"><h1 data-ice="title">source/index.js</h1>
-<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">import &apos;babel-polyfill&apos;;
-
-import {readFileSync} from &apos;fs&apos;;
+<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">import {readFileSync} from &apos;fs&apos;;
 
 import {resolve} from &apos;url&apos;;
 
 import WebServer from &apos;koapache&apos;;
 
 import {watch} from &apos;chokidar&apos;;
+
+import {toString} from &apos;qrcode&apos;;
+
+import promisify from &apos;promisify-node&apos;;
+
+const QRCode = promisify( toString );
+
 
 
 const Env = process.env, config = JSON.parse( readFileSync(&apos;./package.json&apos;) );
@@ -129,11 +134,14 @@ export default  class PuppeteerBrowser {
 
             await onChange();
 
-            await page.bringToFront();
+            if ( page ) {
 
-            await page.reload();
+                await page.bringToFront();
 
-            console.info(`[ Reload ]  ${page.url()}`);
+                await page.reload();
+
+                console.info(`[ Reload ]  ${page.url()}`);
+            }
 
             listen = false;
         }
@@ -160,18 +168,20 @@ export default  class PuppeteerBrowser {
 
         if ( page )  return page;
 
-        fileChange = (fileChange instanceof Function)  &amp;&amp;  fileChange;
-
-        page = await (await PuppeteerBrowser.getBrowser( fileChange )).newPage();
+        fileChange = (fileChange instanceof Function)  ?  fileChange  :  null;
 
         const server = path.indexOf(&apos;http&apos;) &amp;&amp;
             await PuppeteerBrowser.getServer( root );
 
-        await page.goto(
-            server ?
-                resolve(`http://${server.address}:${server.port}/`,  path || &apos;.&apos;)  :
-                path
+        const URI = resolve(
+            `http://${server.address}:${server.port}/`,  path || &apos;.&apos;
         );
+
+        if ( fileChange )  console.info(await QRCode( URI ));
+
+        page = await (await PuppeteerBrowser.getBrowser( fileChange )).newPage();
+
+        await page.on(&apos;close&apos;,  () =&gt; process.exit()).goto(server ? URI : path);
 
         if ( fileChange )
             PuppeteerBrowser.watch(config.directories.lib || root,  fileChange);
