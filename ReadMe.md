@@ -6,6 +6,8 @@ Multiple **Web browser** controller based on [Puppeteer API](https://github.com/
 
 [![NPM](https://nodei.co/npm/puppeteer-browser.png?downloads=true&downloadRank=true&stars=true)](https://nodei.co/npm/puppeteer-browser/)
 
+([Windows users please note](https://github.com/TechQuery/Puppeteer-IE#installation))
+
 
 
 ## Use as a Test runner

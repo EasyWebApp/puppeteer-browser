@@ -37,7 +37,15 @@
 <div class="content" data-ice="content"><h1 data-ice="title">test/index.js</h1>
 <pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">import PuppeteerBrowser from &apos;../source/index&apos;;
 
+import should from &apos;should&apos;;
+
 import sinon from &apos;sinon&apos;;
+
+import desktopEnv from &apos;desktop-env&apos;;
+
+import activeWin from &apos;active-win&apos;;
+
+import processOf from &apos;find-process&apos;;
 
 import promisify from &apos;promisify-node&apos;;
 
@@ -51,12 +59,31 @@ function wait(second, func) {
     ));
 }
 
+async function isActiveWindow(page,  yes = true) {
+
+    const equal = yes ? should.equal : should.notEqual;
+
+    const window = await activeWin(), path = PuppeteerBrowser.executablePath();
+
+    equal(window.title.replace(/\s*-[^-]+$/, &apos;&apos;),  await page.title());
+
+    if ( window.owner.path )
+        equal(path, window.owner.path);
+    else
+        equal(path.match( /([^/]+)(\.\w+)?$/ )[1],  window.owner.name);
+}
+
 
 describe(&apos;Static methods&apos;,  () =&gt; {
 
-    before(() =&gt; mkdir(&apos;test/example&apos;));
+    const file = &apos;test/example/test.js&apos;;  var GUI;
 
-    const file = &apos;test/example/test.js&apos;;
+    before(async () =&gt; {
+
+        await mkdir(&apos;test/example&apos;);
+
+        GUI = (&apos;N/A&apos;  !==  await desktopEnv());
+    });
 
     /**
      * @test {PuppeteerBrowser.watch}
@@ -72,6 +99,42 @@ describe(&apos;Static methods&apos;,  () =&gt; {
         await wait(1,  ()  =&gt;  appendFileSync(file, &apos;test&apos;));
 
         await wait(1,  () =&gt; onChange.should.be.calledOnce());
+    });
+
+    /**
+     * @test {PuppeteerBrowser.getBrowser}
+     * @test {PuppeteerBrowser.getPage}
+     */
+    it(&apos;Open a background page&apos;,  async () =&gt; {
+
+        const page = await PuppeteerBrowser.getPage(&apos;docs/&apos;);
+
+        const browser = await PuppeteerBrowser.getBrowser();
+
+        const process = await processOf(&apos;pid&apos;, browser.process().pid);
+
+        process[0].cmd.should.containEql(&apos;--headless&apos;);
+
+        if ( GUI )  await isActiveWindow(page, false);
+
+        await browser.close();
+    });
+
+    /**
+     * @test {PuppeteerBrowser.getPage}
+     */
+    it(&apos;Open a preview page&apos;,  async () =&gt; {
+
+        if (! GUI)
+            return console.info(
+                &apos;Can\&apos;t test Browser window without Desktop environment&apos;
+            );
+
+        const page = await PuppeteerBrowser.getPage(&apos;docs/&apos;,  null,  () =&gt; { });
+
+        await isActiveWindow( page );
+
+        await page.browser().close();
     });
 
 

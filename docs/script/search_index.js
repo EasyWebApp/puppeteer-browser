@@ -7,13 +7,25 @@ window.esdocSearchIndex = [
   ],
   [
     "",
-    "test-file/test/index.js.html#lineNumber18",
+    "test-file/test/index.js.html#lineNumber40",
     "Static methods",
     "test"
   ],
   [
+    "puppeteerbrowser.getbrowser puppeteerbrowser.getpage source/index.js~puppeteerbrowser.getbrowser,puppeteerbrowser.getbrowser source/index.js~puppeteerbrowser.getpage,puppeteerbrowser.getpage",
+    "test-file/test/index.js.html#lineNumber71",
+    "Static methods Open a background page",
+    "test"
+  ],
+  [
+    "puppeteerbrowser.getpage source/index.js~puppeteerbrowser.getpage,puppeteerbrowser.getpage",
+    "test-file/test/index.js.html#lineNumber89",
+    "Static methods Open a preview page",
+    "test"
+  ],
+  [
     "puppeteerbrowser.watch source/index.js~puppeteerbrowser.watch,puppeteerbrowser.watch",
-    "test-file/test/index.js.html#lineNumber27",
+    "test-file/test/index.js.html#lineNumber54",
     "Static methods Watch files changing",
     "test"
   ],
@@ -312,6 +324,18 @@ window.esdocSearchIndex = [
     "file"
   ],
   [
+    "source/index.js~puppeteerbrowser.browsername",
+    "class/source/index.js~PuppeteerBrowser.html#static-get-browserName",
+    "source/index.js~PuppeteerBrowser.browserName",
+    "member"
+  ],
+  [
+    "source/index.js~puppeteerbrowser.executablepath",
+    "class/source/index.js~PuppeteerBrowser.html#static-method-executablePath",
+    "source/index.js~PuppeteerBrowser.executablePath",
+    "method"
+  ],
+  [
     "source/index.js~puppeteerbrowser.getbrowser",
     "class/source/index.js~PuppeteerBrowser.html#static-method-getBrowser",
     "source/index.js~PuppeteerBrowser.getBrowser",
@@ -334,6 +358,12 @@ window.esdocSearchIndex = [
     "class/source/index.js~PuppeteerBrowser.html#static-method-launch",
     "source/index.js~PuppeteerBrowser.launch",
     "method"
+  ],
+  [
+    "source/index.js~puppeteerbrowser.modulename",
+    "class/source/index.js~PuppeteerBrowser.html#static-get-moduleName",
+    "source/index.js~PuppeteerBrowser.moduleName",
+    "member"
   ],
   [
     "source/index.js~puppeteerbrowser.watch",

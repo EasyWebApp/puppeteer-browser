@@ -47,19 +47,7 @@ var QRCode = (0, _promisifyNode2.default)(_qrcode.toString);
 var Env = process.env,
     config = JSON.parse((0, _fs.readFileSync)('./package.json'));
 
-var browser_name = (Env.npm_config_PUPPETEER_BROWSER || 'chrome').trim(),
-    NPM_command = Env.npm_lifecycle_script;
-
-var module_name = 'puppeteer' + function (map) {
-
-    for (var name in map) {
-        if (browser_name === name) return map[name];
-    }return '';
-}({
-    chrome: '',
-    firefox: '-fx',
-    IE: '-ie'
-});
+var NPM_command = Env.npm_lifecycle_script;
 
 var server, browser, page;
 
@@ -120,15 +108,20 @@ var PuppeteerBrowser = function () {
         }()
 
         /**
+         * @type {string}
+         */
+
+    }, {
+        key: 'launch',
+
+
+        /**
          * @param {Object} [options]
          *
          * @return {Browser}
          *
          * @see https://github.com/GoogleChrome/puppeteer/blob/v1.5.0/docs/api.md#puppeteerlaunchoptions
          */
-
-    }, {
-        key: 'launch',
         value: function () {
             var _ref2 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee2(options) {
                 var Puppeteer;
@@ -138,7 +131,7 @@ var PuppeteerBrowser = function () {
                             case 0:
                                 _context2.next = 2;
                                 return _promise2.default.resolve().then(function () {
-                                    return require('' + module_name);
+                                    return require('' + PuppeteerBrowser.moduleName);
                                 });
 
                             case 2:
@@ -165,6 +158,19 @@ var PuppeteerBrowser = function () {
         }()
 
         /**
+         * @return {string}
+         *
+         * @see https://github.com/GoogleChrome/puppeteer/blob/v1.5.0/docs/api.md#puppeteerexecutablepath
+         */
+
+    }, {
+        key: 'executablePath',
+        value: function executablePath() {
+
+            return Env['npm_config_' + PuppeteerBrowser.browserName];
+        }
+
+        /**
          * @protected
          *
          * @param {boolean} [visible] - Browser visibility
@@ -180,24 +186,25 @@ var PuppeteerBrowser = function () {
                     while (1) {
                         switch (_context3.prev = _context3.next) {
                             case 0:
-                                _context3.t0 = browser;
-
-                                if (_context3.t0) {
-                                    _context3.next = 5;
+                                if (!browser) {
+                                    _context3.next = 2;
                                     break;
                                 }
 
+                                return _context3.abrupt('return', browser);
+
+                            case 2:
                                 _context3.next = 4;
                                 return PuppeteerBrowser.launch({
-                                    executablePath: Env['npm_config_' + browser_name],
+                                    executablePath: PuppeteerBrowser.executablePath(),
                                     headless: visible != null ? !visible : !NPM_command.includes('--inspect')
                                 });
 
                             case 4:
-                                _context3.t0 = browser = _context3.sent;
-
-                            case 5:
-                                return _context3.abrupt('return', _context3.t0);
+                                browser = _context3.sent;
+                                return _context3.abrupt('return', browser.on('disconnected', function () {
+                                    return browser = page = null;
+                                }));
 
                             case 6:
                             case 'end':
@@ -308,61 +315,63 @@ var PuppeteerBrowser = function () {
 
                             case 2:
 
+                                path = path || '.';
+
                                 fileChange = fileChange instanceof Function ? fileChange : null;
 
                                 _context5.t0 = path.indexOf('http');
 
                                 if (!_context5.t0) {
-                                    _context5.next = 8;
+                                    _context5.next = 9;
                                     break;
                                 }
 
-                                _context5.next = 7;
+                                _context5.next = 8;
                                 return PuppeteerBrowser.getServer(root);
 
-                            case 7:
+                            case 8:
                                 _context5.t0 = _context5.sent;
 
-                            case 8:
+                            case 9:
                                 server = _context5.t0;
-                                URI = (0, _url.resolve)('http://' + server.address + ':' + server.port + '/', path || '.');
+                                URI = (0, _url.resolve)('http://' + server.address + ':' + server.port + '/', path);
 
                                 if (!fileChange) {
-                                    _context5.next = 16;
+                                    _context5.next = 17;
                                     break;
                                 }
 
                                 _context5.t1 = console;
-                                _context5.next = 14;
+                                _context5.next = 15;
                                 return QRCode(URI);
 
-                            case 14:
+                            case 15:
                                 _context5.t2 = _context5.sent;
 
                                 _context5.t1.info.call(_context5.t1, _context5.t2);
 
-                            case 16:
-                                _context5.next = 18;
+                            case 17:
+                                _context5.next = 19;
                                 return PuppeteerBrowser.getBrowser(fileChange);
 
-                            case 18:
-                                _context5.next = 20;
+                            case 19:
+                                _context5.next = 21;
                                 return _context5.sent.newPage();
 
-                            case 20:
+                            case 21:
                                 page = _context5.sent;
-                                _context5.next = 23;
+                                _context5.next = 24;
                                 return page.on('close', function () {
-                                    return process.exit();
+                                    return page = null;
                                 }).goto(server ? URI : path);
 
-                            case 23:
+                            case 24:
 
                                 if (fileChange) PuppeteerBrowser.watch(config.directories.lib || root, fileChange);
 
                                 return _context5.abrupt('return', page);
 
-                            case 25:
+                            case 26:
                             case 'end':
                                 return _context5.stop();
                         }
@@ -376,6 +385,32 @@ var PuppeteerBrowser = function () {
 
             return getPage;
         }()
+    }, {
+        key: 'browserName',
+        get: function get() {
+
+            return (Env.npm_config_PUPPETEER_BROWSER || 'chrome').trim();
+        }
+
+        /**
+         * @type {string}
+         */
+
+    }, {
+        key: 'moduleName',
+        get: function get() {
+
+            return 'puppeteer' + function (map) {
+
+                for (var name in map) {
+                    if (name === PuppeteerBrowser.browserName) return map[name];
+                }return '';
+            }({
+                chrome: '',
+                firefox: '-fx',
+                IE: '-ie'
+            });
+        }
     }]);
     return PuppeteerBrowser;
 }();
