@@ -7,25 +7,25 @@ window.esdocSearchIndex = [
   ],
   [
     "",
-    "test-file/test/index.js.html#lineNumber40",
+    "test-file/test/index.js.html#lineNumber38",
     "Static methods",
     "test"
   ],
   [
     "puppeteerbrowser.getbrowser puppeteerbrowser.getpage source/index.js~puppeteerbrowser.getbrowser,puppeteerbrowser.getbrowser source/index.js~puppeteerbrowser.getpage,puppeteerbrowser.getpage",
-    "test-file/test/index.js.html#lineNumber71",
+    "test-file/test/index.js.html#lineNumber69",
     "Static methods Open a background page",
     "test"
   ],
   [
     "puppeteerbrowser.getpage source/index.js~puppeteerbrowser.getpage,puppeteerbrowser.getpage",
-    "test-file/test/index.js.html#lineNumber89",
+    "test-file/test/index.js.html#lineNumber87",
     "Static methods Open a preview page",
     "test"
   ],
   [
     "puppeteerbrowser.watch source/index.js~puppeteerbrowser.watch,puppeteerbrowser.watch",
-    "test-file/test/index.js.html#lineNumber54",
+    "test-file/test/index.js.html#lineNumber52",
     "Static methods Watch files changing",
     "test"
   ],

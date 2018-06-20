@@ -91,17 +91,20 @@ export default  class PuppeteerBrowser {
      * @protected
      *
      * @param {boolean} [visible] - Browser visibility
-     *
+     *                              (Visible mode will run slowly for seeing clearly)
      * @return {Browser}
      */
     static async getBrowser(visible) {
 
         if ( browser )  return browser;
 
+        visible = (visible != null)  ?
+            visible  :  NPM_command.includes('--inspect');
+
         browser = await PuppeteerBrowser.launch({
             executablePath:  PuppeteerBrowser.executablePath(),
-            headless:        (visible != null)  ?
-                (! visible)  :  (! NPM_command.includes('--inspect'))
+            headless:        ! visible,
+            slowMo:          visible ? 500 : 0
         });
 
         return  browser.on('disconnected',  () => browser = page = null);
@@ -151,7 +154,7 @@ export default  class PuppeteerBrowser {
      * @param {?string}  path         - Path to open Web page
      * @param {function} [fileChange] - Do something between files changed & page reload
      *                                  (Browser will be visible)
-     * @return {Page}
+     * @return {Page} Resolve after `DOMContentLoaded` event fired
      */
     static async getPage(root, path, fileChange) {
 
@@ -170,7 +173,9 @@ export default  class PuppeteerBrowser {
 
         page = await (await PuppeteerBrowser.getBrowser( fileChange )).newPage();
 
-        await page.on('close',  () => page = null).goto(server ? URI : path);
+        await page.on('close',  () => page = null).goto(server ? URI : path,  {
+            waitUntil:  'domcontentloaded'
+        });
 
         if ( fileChange )
             PuppeteerBrowser.watch(config.directories.lib || root,  fileChange);

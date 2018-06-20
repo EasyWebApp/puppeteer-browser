@@ -28,8 +28,6 @@ async function isActiveWindow(page,  yes = true) {
 
     const window = await activeWin(), path = PuppeteerBrowser.executablePath();
 
-    equal(window.title.replace(/\s*-[^-]+$/, ''),  await page.title());
-
     if ( window.owner.path )
         equal(path, window.owner.path);
     else

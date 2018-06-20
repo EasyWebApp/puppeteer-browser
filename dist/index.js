@@ -174,7 +174,7 @@ var PuppeteerBrowser = function () {
          * @protected
          *
          * @param {boolean} [visible] - Browser visibility
-         *
+         *                              (Visible mode will run slowly for seeing clearly)
          * @return {Browser}
          */
 
@@ -194,19 +194,23 @@ var PuppeteerBrowser = function () {
                                 return _context3.abrupt('return', browser);
 
                             case 2:
-                                _context3.next = 4;
+
+                                visible = visible != null ? visible : NPM_command.includes('--inspect');
+
+                                _context3.next = 5;
                                 return PuppeteerBrowser.launch({
                                     executablePath: PuppeteerBrowser.executablePath(),
-                                    headless: visible != null ? !visible : !NPM_command.includes('--inspect')
+                                    headless: !visible,
+                                    slowMo: visible ? 500 : 0
                                 });
 
-                            case 4:
+                            case 5:
                                 browser = _context3.sent;
                                 return _context3.abrupt('return', browser.on('disconnected', function () {
                                     return browser = page = null;
                                 }));
 
-                            case 6:
+                            case 7:
                             case 'end':
                                 return _context3.stop();
                         }
@@ -294,7 +298,7 @@ var PuppeteerBrowser = function () {
          * @param {?string}  path         - Path to open Web page
          * @param {function} [fileChange] - Do something between files changed & page reload
          *                                  (Browser will be visible)
-         * @return {Page}
+         * @return {Page} Resolve after `DOMContentLoaded` event fired
          */
 
     }, {
@@ -363,7 +367,9 @@ var PuppeteerBrowser = function () {
                                 _context5.next = 24;
                                 return page.on('close', function () {
                                     return page = null;
-                                }).goto(server ? URI : path);
+                                }).goto(server ? URI : path, {
+                                    waitUntil: 'domcontentloaded'
+                                });
 
                             case 24:
 
