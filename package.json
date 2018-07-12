@@ -1,6 +1,6 @@
 {
   "name": "puppeteer-browser",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "Multiple Web browser controller based on Puppeteer API",
   "main": "dist/index.js",
   "directories": {
@@ -10,15 +10,17 @@
     "node": "^6.5.0"
   },
   "scripts": {
-    "build": "babel source/ -d dist/  &&  esdoc",
+    "lint": "eslint source/ test/ --fix",
+    "bundle": "babel source/ -d dist/",
+    "prepublishOnly": "npm run lint  &&  npm run bundle",
+    "build": "npm run prepublishOnly  &&  esdoc  &&  git add .",
     "start": "web-server docs/ -o",
-    "prepublishOnly": "npm run build",
     "preinstall": "npm set puppeteer_skip_chromium_download true",
     "install": "app-find chrome firefox -c",
     "check": "mocha -r babel-register -r should-sinon --no-timeouts -c --inline-diffs",
     "test": "npm run check -- --exit",
     "debug": "npm run check -- --inspect-brk",
-    "precommit": "eslint source/ test/  &&  npm test"
+    "precommit": "npm test  &&  npm run build"
   },
   "repository": {
     "type": "git",
@@ -40,9 +42,9 @@
   "dependencies": {
     "babel-polyfill": "^6.26.0",
     "babel-runtime": "^6.26.0",
-    "chokidar": "^2.0.3",
+    "chokidar": "^2.0.4",
     "fs-match": "^1.3.4",
-    "koapache": "^0.2.3",
+    "koapache": "^1.0.0",
     "promisify-node": "^0.5.0",
     "puppeteer": "^1.5.0",
     "puppeteer-fx": "0.0.4",
@@ -54,7 +56,7 @@
   "devDependencies": {
     "active-win": "^3.0.0",
     "babel-cli": "^6.26.0",
-    "babel-eslint": "^8.2.3",
+    "babel-eslint": "^8.2.6",
     "babel-plugin-dynamic-import-node": "^1.2.0",
     "babel-plugin-transform-runtime": "^6.23.0",
     "babel-preset-env": "^1.7.0",
@@ -70,14 +72,19 @@
     "mocha": "^5.2.0",
     "should": "^13.2.1",
     "should-sinon": "0.0.6",
-    "sinon": "^6.0.0"
+    "sinon": "^6.1.3"
   },
   "babel": {
     "presets": [
       "env"
     ],
     "plugins": [
-      "transform-runtime",
+      [
+        "transform-runtime",
+        {
+          "polyfill": false
+        }
+      ],
       "dynamic-import-node"
     ]
   }

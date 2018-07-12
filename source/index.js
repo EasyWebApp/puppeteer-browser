@@ -34,7 +34,9 @@ export default  class PuppeteerBrowser {
      */
     static async getServer(root) {
 
-        return  server  ||  (server = await WebServer(root || '.'));
+        return  server || (
+            server = await (new WebServer(root || '.')).workerHost()
+        );
     }
 
     /**

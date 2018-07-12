@@ -4,10 +4,6 @@ Object.defineProperty(exports, "__esModule", {
     value: true
 });
 
-var _promise = require('babel-runtime/core-js/promise');
-
-var _promise2 = _interopRequireDefault(_promise);
-
 var _regenerator = require('babel-runtime/regenerator');
 
 var _regenerator2 = _interopRequireDefault(_regenerator);
@@ -84,7 +80,7 @@ var PuppeteerBrowser = function () {
                                 }
 
                                 _context.next = 4;
-                                return (0, _koapache2.default)(root || '.');
+                                return new _koapache2.default(root || '.').workerHost();
 
                             case 4:
                                 _context.t0 = server = _context.sent;
@@ -130,7 +126,7 @@ var PuppeteerBrowser = function () {
                         switch (_context2.prev = _context2.next) {
                             case 0:
                                 _context2.next = 2;
-                                return _promise2.default.resolve().then(function () {
+                                return Promise.resolve().then(function () {
                                     return require('' + PuppeteerBrowser.moduleName);
                                 });
 
