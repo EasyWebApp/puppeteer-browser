@@ -72,9 +72,10 @@ describe('Static methods',  () => {
 
         const browser = await PuppeteerBrowser.getBrowser();
 
-        const process = await processOf('pid', browser.process().pid);
+        const task = await processOf('pid', browser.process().pid);
 
-        process[0].cmd.should.containEql('--headless');
+        if (! process.env.npm_lifecycle_script.includes('--inspect'))
+            task[0].cmd.should.containEql('--headless');
 
         if ( GUI )  await isActiveWindow(page, false);
 

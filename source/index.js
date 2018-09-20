@@ -74,7 +74,7 @@ export default  class PuppeteerBrowser {
      */
     static async launch(options) {
 
-        const Puppeteer = await import( PuppeteerBrowser.moduleName );
+        const Puppeteer = (await import( PuppeteerBrowser.moduleName )).default;
 
         return  await Puppeteer.launch( options );
     }
@@ -106,7 +106,7 @@ export default  class PuppeteerBrowser {
         browser = await PuppeteerBrowser.launch({
             executablePath:  PuppeteerBrowser.executablePath(),
             headless:        ! visible,
-            slowMo:          visible ? 500 : 0
+            slowMo:          visible ? 100 : 0
         });
 
         return  browser.on('disconnected',  () => browser = page = null);

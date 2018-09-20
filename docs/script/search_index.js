@@ -19,7 +19,7 @@ window.esdocSearchIndex = [
   ],
   [
     "puppeteerbrowser.getpage source/index.js~puppeteerbrowser.getpage,puppeteerbrowser.getpage",
-    "test-file/test/index.js.html#lineNumber87",
+    "test-file/test/index.js.html#lineNumber88",
     "Static methods Open a preview page",
     "test"
   ],
