@@ -1,4 +1,4 @@
-import {readFileSync} from 'fs';
+import {packageOf} from '@tech_query/node-toolkit';
 
 import {resolve} from 'url';
 
@@ -14,7 +14,7 @@ const QRCode = promisify( toString );
 
 
 
-const Env = process.env, config = JSON.parse( readFileSync('./package.json') );
+const Env = process.env, config = packageOf('./test').meta;
 
 const NPM_command = Env.npm_lifecycle_script;
 
@@ -55,7 +55,7 @@ export default  class PuppeteerBrowser {
         return  'puppeteer' + (map => {
 
             for (let name in map)
-                if (name === PuppeteerBrowser.browserName)  return map[name];
+                if (name === this.browserName)  return map[name];
 
             return '';
         })({
@@ -74,7 +74,7 @@ export default  class PuppeteerBrowser {
      */
     static async launch(options) {
 
-        const Puppeteer = (await import( PuppeteerBrowser.moduleName )).default;
+        const Puppeteer = (await import( this.moduleName )).default;
 
         return  await Puppeteer.launch( options );
     }
@@ -86,7 +86,7 @@ export default  class PuppeteerBrowser {
      */
     static executablePath() {
 
-        return  Env['npm_config_' + PuppeteerBrowser.browserName];
+        return  Env['npm_config_' + this.browserName];
     }
 
     /**
@@ -103,8 +103,8 @@ export default  class PuppeteerBrowser {
         visible = (visible != null)  ?
             visible  :  NPM_command.includes('--inspect');
 
-        browser = await PuppeteerBrowser.launch({
-            executablePath:  PuppeteerBrowser.executablePath(),
+        browser = await this.launch({
+            executablePath:  this.executablePath(),
             headless:        ! visible,
             slowMo:          visible ? 100 : 0
         });
@@ -166,21 +166,20 @@ export default  class PuppeteerBrowser {
 
         fileChange = (fileChange instanceof Function)  ?  fileChange  :  null;
 
-        const server = path.indexOf('http') &&
-            await PuppeteerBrowser.getServer( root );
+        const server = path.indexOf('http')  &&  await this.getServer( root );
 
         const URI = resolve(`http://${server.address}:${server.port}/`, path);
 
         if ( fileChange )  console.info(await QRCode( URI ));
 
-        page = await (await PuppeteerBrowser.getBrowser( fileChange )).newPage();
+        page = await (await this.getBrowser( fileChange )).newPage();
 
         await page.on('close',  () => page = null).goto(server ? URI : path,  {
             waitUntil:  'domcontentloaded'
         });
 
         if ( fileChange )
-            PuppeteerBrowser.watch(config.directories.lib || root,  fileChange);
+            this.watch(config.directories.lib || root,  fileChange);
 
         return page;
     }

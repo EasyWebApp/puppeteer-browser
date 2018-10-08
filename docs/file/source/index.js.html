@@ -35,7 +35,7 @@
 </nav>
 
 <div class="content" data-ice="content"><h1 data-ice="title">source/index.js</h1>
-<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">import {readFileSync} from &apos;fs&apos;;
+<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">import {packageOf} from &apos;@tech_query/node-toolkit&apos;;
 
 import {resolve} from &apos;url&apos;;
 
@@ -51,7 +51,7 @@ const QRCode = promisify( toString );
 
 
 
-const Env = process.env, config = JSON.parse( readFileSync(&apos;./package.json&apos;) );
+const Env = process.env, config = packageOf(&apos;./test&apos;).meta;
 
 const NPM_command = Env.npm_lifecycle_script;
 
@@ -92,7 +92,7 @@ export default  class PuppeteerBrowser {
         return  &apos;puppeteer&apos; + (map =&gt; {
 
             for (let name in map)
-                if (name === PuppeteerBrowser.browserName)  return map[name];
+                if (name === this.browserName)  return map[name];
 
             return &apos;&apos;;
         })({
@@ -111,7 +111,7 @@ export default  class PuppeteerBrowser {
      */
     static async launch(options) {
 
-        const Puppeteer = (await import( PuppeteerBrowser.moduleName )).default;
+        const Puppeteer = (await import( this.moduleName )).default;
 
         return  await Puppeteer.launch( options );
     }
@@ -123,7 +123,7 @@ export default  class PuppeteerBrowser {
      */
     static executablePath() {
 
-        return  Env[&apos;npm_config_&apos; + PuppeteerBrowser.browserName];
+        return  Env[&apos;npm_config_&apos; + this.browserName];
     }
 
     /**
@@ -140,8 +140,8 @@ export default  class PuppeteerBrowser {
         visible = (visible != null)  ?
             visible  :  NPM_command.includes(&apos;--inspect&apos;);
 
-        browser = await PuppeteerBrowser.launch({
-            executablePath:  PuppeteerBrowser.executablePath(),
+        browser = await this.launch({
+            executablePath:  this.executablePath(),
             headless:        ! visible,
             slowMo:          visible ? 100 : 0
         });
@@ -203,21 +203,20 @@ export default  class PuppeteerBrowser {
 
         fileChange = (fileChange instanceof Function)  ?  fileChange  :  null;
 
-        const server = path.indexOf(&apos;http&apos;) &amp;&amp;
-            await PuppeteerBrowser.getServer( root );
+        const server = path.indexOf(&apos;http&apos;)  &amp;&amp;  await this.getServer( root );
 
         const URI = resolve(`http://${server.address}:${server.port}/`, path);
 
         if ( fileChange )  console.info(await QRCode( URI ));
 
-        page = await (await PuppeteerBrowser.getBrowser( fileChange )).newPage();
+        page = await (await this.getBrowser( fileChange )).newPage();
 
         await page.on(&apos;close&apos;,  () =&gt; page = null).goto(server ? URI : path,  {
             waitUntil:  &apos;domcontentloaded&apos;
         });
 
         if ( fileChange )
-            PuppeteerBrowser.watch(config.directories.lib || root,  fileChange);
+            this.watch(config.directories.lib || root,  fileChange);
 
         return page;
     }

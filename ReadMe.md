@@ -23,7 +23,7 @@ import PuppeteerBrowser from 'puppeteer-browser';
         'path/to/start/server', 'path/to/open/page'
     );
 
-    console.log( page.title() );
+    console.log(await page.title());
 })();
 ```
 
