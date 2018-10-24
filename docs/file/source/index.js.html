@@ -51,7 +51,7 @@ const QRCode = promisify( toString );
 
 
 
-const Env = process.env, config = packageOf(&apos;./test&apos;).meta;
+const Env = process.env, config = (packageOf(&apos;./test&apos;) || &apos;&apos;).meta;
 
 const NPM_command = Env.npm_lifecycle_script;
 
