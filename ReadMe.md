@@ -3,6 +3,7 @@
 Multiple **Web browser** controller based on [Puppeteer API](https://github.com/GoogleChrome/puppeteer/blob/v1.5.0/docs/api.md), wraps [`puppeteer`](https://pptr.dev/), [`puppeteer-fx`](https://github.com/autonome/puppeteer-fx) & [`puppeteer-ie`](https://techquery.github.io/Puppeteer-IE/) in one package.
 
 [![NPM Dependency](https://david-dm.org/EasyWebApp/puppeteer-browser.svg)](https://david-dm.org/EasyWebApp/puppeteer-browser)
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2FEasyWebApp%2Fpuppeteer-browser.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2FEasyWebApp%2Fpuppeteer-browser?ref=badge_shield)
 
 [![NPM](https://nodei.co/npm/puppeteer-browser.png?downloads=true&downloadRank=true&stars=true)](https://nodei.co/npm/puppeteer-browser/)
 
@@ -56,3 +57,7 @@ npm set PUPPETEER_BROWSER IE  &&  node your_script
  - Online: [URL](https://easywebapp.github.io/puppeteer-browser) or `npm docs`
 
  - Offline: `npm start`
+
+
+## License
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2FEasyWebApp%2Fpuppeteer-browser.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2FEasyWebApp%2Fpuppeteer-browser?ref=badge_large)
