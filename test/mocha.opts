@@ -1,0 +1,6 @@
+--require @babel/register
+--require @babel/polyfill
+--require should-sinon
+--no-timeouts
+--colors
+--inline-diffs

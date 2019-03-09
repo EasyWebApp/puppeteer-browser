@@ -1,6 +1,8 @@
-docs/
-test/
 .editorconfig
 .eslintrc.json
+.babelrc
+test/
 .esdoc.json
+docs/
 .github/
+.travis.yml

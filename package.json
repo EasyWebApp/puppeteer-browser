@@ -1,6 +1,6 @@
 {
   "name": "puppeteer-browser",
-  "version": "0.3.6",
+  "version": "0.3.8",
   "description": "Multiple Web browser controller based on Puppeteer API",
   "keywords": [
     "Web",
@@ -11,7 +11,7 @@
   ],
   "author": "shiy2008@gmail.com",
   "license": "Apache-2.0",
-  "homepage": "https://easywebapp.github.io/puppeteer-browser",
+  "homepage": "https://web-cell.tk/puppeteer-browser",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/EasyWebApp/puppeteer-browser.git"
@@ -25,19 +25,19 @@
     "lib": "source/"
   },
   "engines": {
-    "node": "^6.5.0"
+    "node": "^6.3.0"
   },
   "scripts": {
     "lint": "eslint source/ test/ --fix",
-    "pack": "amd-bundle source/index dist/index",
-    "check": "mocha -r @babel/register -r should-sinon --no-timeouts -c --inline-diffs",
-    "test": "npm run check -- --exit",
-    "debug": "npm run check -- --inspect-brk",
+    "pack": "babel source/ -d dist/ -s",
+    "test": "mocha --exit",
+    "debug": "mocha --inspect-brk",
     "build": "npm test  &&  npm run lint  &&  npm run pack  &&  esdoc",
     "prepublishOnly": "npm run build",
     "preinstall": "npm set puppeteer_skip_chromium_download true",
     "install": "app-find chrome firefox -c",
-    "start": "web-server docs/ -o"
+    "docs": "esdoc",
+    "start": "esdoc  &&  web-server docs/ -o"
   },
   "husky": {
     "hooks": {
@@ -45,26 +45,27 @@
     }
   },
   "dependencies": {
-    "@babel/polyfill": "^7.0.0",
-    "@babel/runtime": "^7.1.2",
-    "@tech_query/node-toolkit": "^0.7.1",
-    "chokidar": "^2.0.4",
+    "@babel/polyfill": "^7.2.5",
+    "@babel/runtime": "^7.3.4",
+    "@tech_query/node-toolkit": "^0.9.3",
+    "chokidar": "^2.1.2",
     "fs-match": "^1.3.5",
-    "koapache": "^1.0.4",
+    "koapache": "^1.0.6",
     "promisify-node": "^0.5.0",
     "puppeteer": "1.5.0",
     "puppeteer-fx": "0.0.4",
-    "qrcode": "^1.3.0"
+    "qrcode": "^1.3.3"
   },
   "optionalDependencies": {
     "puppeteer-ie": "^0.5.7"
   },
   "devDependencies": {
-    "@babel/plugin-transform-runtime": "^7.1.0",
-    "@babel/preset-env": "^7.1.0",
+    "@babel/cli": "^7.2.3",
+    "@babel/core": "^7.3.4",
+    "@babel/plugin-transform-runtime": "^7.3.4",
+    "@babel/preset-env": "^7.3.4",
     "@babel/register": "^7.0.0",
     "active-win": "^3.0.1",
-    "amd-bundle": "^1.7.3",
     "babel-eslint": "^10.0.1",
     "babel-plugin-dynamic-import-node": "^2.2.0",
     "desktop-env": "^3.0.0",
@@ -72,21 +73,12 @@
     "esdoc-ecmascript-proposal-plugin": "^1.0.0",
     "esdoc-external-nodejs-plugin": "^1.0.0",
     "esdoc-standard-plugin": "^1.0.0",
-    "eslint": "^5.7.0",
-    "find-process": "^1.1.4",
-    "husky": "^1.1.2",
-    "mocha": "^5.2.0",
+    "eslint": "^5.15.1",
+    "find-process": "^1.2.1",
+    "husky": "^1.3.1",
+    "mocha": "^6.0.2",
     "should": "^13.2.3",
     "should-sinon": "0.0.6",
-    "sinon": "^7.0.0"
-  },
-  "babel": {
-    "presets": [
-      "@babel/preset-env"
-    ],
-    "plugins": [
-      "dynamic-import-node",
-      "@babel/plugin-transform-runtime"
-    ]
+    "sinon": "^7.2.7"
   }
 }

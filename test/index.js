@@ -1,8 +1,8 @@
 import PuppeteerBrowser from '../source/index';
 
-import should from 'should';
+import { equal, notEqual } from 'should';
 
-import sinon from 'sinon';
+import { spy } from 'sinon';
 
 import desktopEnv from 'desktop-env';
 
@@ -12,26 +12,24 @@ import processOf from 'find-process';
 
 import promisify from 'promisify-node';
 
-const {mkdir, writeFile, appendFileSync, unlink, rmdir} = promisify('fs');
+const { mkdir, writeFile, appendFile, unlink, rmdir } = promisify('fs');
 
 
-function wait(second, func) {
+function wait(second) {
 
-    return  new Promise(resolve => setTimeout(
-        ()  =>  resolve( func() ),  second * 1000
-    ));
+    return  new Promise(resolve => setTimeout(resolve,  second * 1000));
 }
 
 async function isActiveWindow(page,  yes = true) {
 
-    const equal = yes ? should.equal : should.notEqual;
+    const assert = yes ? equal : notEqual;
 
     const window = await activeWin(), path = PuppeteerBrowser.executablePath();
 
     if ( window.owner.path )
-        equal(path, window.owner.path);
+        assert(path, window.owner.path);
     else
-        equal(path.match( /([^/]+)(\.\w+)?$/ )[1],  window.owner.name);
+        assert(path.match( /([^/]+)(\.\w+)?$/ )[1],  window.owner.name);
 }
 
 
@@ -51,15 +49,19 @@ describe('Static methods',  () => {
      */
     it('Watch files changing',  async () => {
 
-        const onChange = sinon.spy();
+        const onChange = spy();
 
         await writeFile(file, '');
 
         PuppeteerBrowser.watch('test/example/', onChange);
 
-        await wait(1,  ()  =>  appendFileSync(file, 'test'));
+        await wait( 1 );
 
-        await wait(1,  () => onChange.should.be.calledOnce());
+        await appendFile(file, 'test');
+
+        await wait( 1 );
+
+        onChange.should.be.calledOnce();
     });
 
     /**

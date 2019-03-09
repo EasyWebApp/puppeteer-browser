@@ -14,9 +14,9 @@ const QRCode = promisify( toString );
 
 
 
-const Env = process.env, config = (packageOf('./test') || '').meta;
+const { env } = process, config = (packageOf('./test') || '').meta;
 
-const NPM_command = Env.npm_lifecycle_script;
+const NPM_command = env.npm_lifecycle_script;
 
 var server, browser, page;
 
@@ -44,7 +44,7 @@ export default  class PuppeteerBrowser {
      */
     static get browserName() {
 
-        return  (Env.npm_config_PUPPETEER_BROWSER || 'chrome').trim();
+        return  (env.npm_config_PUPPETEER_BROWSER || 'chrome').trim();
     }
 
     /**
@@ -66,11 +66,9 @@ export default  class PuppeteerBrowser {
     }
 
     /**
-     * @param {Object} [options]
+     * @param {Object} [options] - https://pptr.dev/#?product=Puppeteer&version=v1.5.0&show=api-puppeteerlaunchoptions
      *
      * @return {Browser}
-     *
-     * @see https://github.com/GoogleChrome/puppeteer/blob/v1.5.0/docs/api.md#puppeteerlaunchoptions
      */
     static async launch(options) {
 
@@ -80,13 +78,11 @@ export default  class PuppeteerBrowser {
     }
 
     /**
-     * @return {string}
-     *
-     * @see https://github.com/GoogleChrome/puppeteer/blob/v1.5.0/docs/api.md#puppeteerexecutablepath
+     * @return {string} https://pptr.dev/#?product=Puppeteer&version=v1.5.0&show=api-puppeteerexecutablepath
      */
     static executablePath() {
 
-        return  Env['npm_config_' + this.browserName];
+        return  env['npm_config_' + this.browserName];
     }
 
     /**
